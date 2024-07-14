@@ -1,6 +1,6 @@
 # PROJECT-IN-COMPUTER-GRAPHICS-AISHA-SALAM
 
- **installations:**
+ **Installations:**
  - pip install vedo
 
 
