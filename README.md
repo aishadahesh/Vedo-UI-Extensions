@@ -1,8 +1,8 @@
 # PROJECT-IN-COMPUTER-GRAPHICS-AISHA-SALAM
 
- **installations:**
+ **Installations:**
  - pip install vedo
-
+ 
 
 ### Overview:
 In this repository, we have extended the Vedo library with additional components. Below is an explanation of each implementation:
@@ -32,4 +32,4 @@ In this repository, we have extended the Vedo library with additional components
  - The adder component allows users to perform arithmetic operations interactively. It provides input fields for users to enter numbers and buttons for addition, subtraction, multiplication, and division operations.
 
 8. **Text Editor:**
-- 
+- Text editor with a customizable text box and various controls, including combo boxes for font, text color, background color, text size, and file name, along with buttons for saving, deleting, and adjusting text size and case.

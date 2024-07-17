@@ -1,8 +1,10 @@
 from vedo import Plotter, Text2D, Rectangle, Button, settings
+import os
 
 class ComboBox:
-    def __init__(self, plotter, options, default_text="Select an option", position=(0, 0)):
+    def __init__(self, plotter, options, color='green', default_text="Select an option", position=(0, 0)):
         self.plotter = plotter
+        self.color = color
         self.options = options
         self.default_text = default_text
         self.selected_option = default_text
@@ -11,11 +13,10 @@ class ComboBox:
         self.dropdown_visible = False
         self.change_callback = None
         self.position = position
-
         self.build_combo_box()
 
     def build_combo_box(self):
-        self.label = Text2D(self.selected_option, pos=self.position, c='k', bg='white')
+        self.label = Text2D(self.selected_option, pos=self.position, c='k', bg=self.color)
         self.label.pickable()
         self.plotter += self.label
 
@@ -33,7 +34,6 @@ class ComboBox:
             self.option_actors.append(text)
 
         self.hide_dropdown()
-
         self.plotter.add_callback("mouse click", self.on_mouse_click)
 
     def show_dropdown(self):
@@ -77,6 +77,7 @@ class ComboBox:
     def set_change_callback(self, callback):
         self.change_callback = callback
 
+
 class TextBox:
     def __init__(self, initial_text="", pos=(0.5, 0.5), size=(0.8, 0.6), max_lines=15, max_line_length=80, callback=None):
         self.text = initial_text
@@ -89,49 +90,76 @@ class TextBox:
         self.color = 'black'
         self.bg_color = 'white'
         self.text_size = 1
-        self.align = "left"
+        self.file = 'output'
+        self.uppercase = False  # New attribute to handle uppercase
         self.window = Plotter(size=(800, 600), title="Text Box Example", interactive=True)
-        self.text_actor = Text2D(self.text, pos=self.pos, c=self.color, bg=self.bg_color, font=self.font, s=self.text_size, justify=self.align)
-        
+        self.text_actor = Text2D(self.text, pos=self.pos, c=self.color, bg=self.bg_color, font=self.font, s=self.text_size, justify='left')
+
         self.update_rect()
-        
+        self.window += Text2D('   ', bg='lightgrey', c='green', s=31, pos=(0.1, 0.8))
         self.window += self.rect_actor
         self.window += self.text_actor
         self.window.add_callback("KeyPressEvent", self.on_key_press)
 
-        font_options = ["Antares", "Archistico", "Bongas", "Brachium", "Calco", "Calibri", "Capsmall",
-                        "Cartoons123", "Comae", "ComicMono", "Dalim", "DejavuSansMono",
-                        "Edo", "FiraMonoBold","FiraMonoMedium", "Glasgo"]
-        color_options = ["black", "red", "green", "blue", "yellow", "purple", "orange", "pink", "brown"]
-        bg_color_options = ["white", "lightgrey", "lightblue", "lightgreen", "lightyellow", "lightpink"]
-        size_options = ["1", "2", "3", "4", "5"]
-        align_options = ["left", "center", "right"]
-
-        self.combo_box_font = ComboBox(self.window, font_options, default_text="TextFont", position=(0.01, 0.9))
-        self.combo_box_font.set_change_callback(self.apply_font_style)
-
-        self.combo_box_color = ComboBox(self.window, color_options, default_text="TextColor", position=(0.11, 0.9))
-        self.combo_box_color.set_change_callback(self.apply_text_color)
-
-        self.combo_box_bg_color = ComboBox(self.window, bg_color_options, default_text="BackgroundColor", position=(0.21, 0.9))
-        self.combo_box_bg_color.set_change_callback(self.apply_bg_color)
-
-        self.combo_box_size = ComboBox(self.window, size_options, default_text="TextSize", position=(0.37, 0.9))
-        self.combo_box_size.set_change_callback(self.apply_text_size)
-
-        self.combo_box_align = ComboBox(self.window, align_options, default_text="TextAlignment", position=(0.47, 0.9))
-        self.combo_box_align.set_change_callback(self.apply_text_align)
-
-        save_button = Button(pos=(0.8, 0.9), states=["SaveFile"], c=["w"], bc=["g"], font="Comae")
-        self.window += save_button
-
-        self.window.add_callback("mouse click", self.on_save_button_click)
+        self.setup_comboboxes()
+        self.setup_buttons()
 
         self.window.show(interactive=True)
 
+    def setup_comboboxes(self):
+        font_options = ["Antares", "Archistico", "Bongas", "Brachium", "Calco", "Calibri", "Capsmall",
+                        "Cartoons123", "Comae", "ComicMono", "Dalim", "DejavuSansMono",
+                        "Edo", "FiraMonoBold", "FiraMonoMedium", "Glasgo"]
+        color_options = ["black", "red", "green", "blue", "yellow", "purple", "orange", "pink", "brown"]
+        bg_color_options = ["white", "lightgrey", "lightblue", "lightgreen", "lightyellow", "lightpink"]
+        size_options = ["1", "2", "3", "4", "5"]
+        file_options = ["output1", "output2", "output3"]
+
+        self.combo_box_font = ComboBox(self.window, font_options, color='lightgrey', default_text="TextFont", position=(0.01, 0.95))
+        self.combo_box_font.set_change_callback(self.apply_font_style)
+
+        self.combo_box_color = ComboBox(self.window, color_options, color='lightgrey', default_text="TextColor", position=(0.11, 0.95))
+        self.combo_box_color.set_change_callback(self.apply_text_color)
+
+        self.combo_box_bg_color = ComboBox(self.window, bg_color_options, color='lightgrey', default_text="BackgroundColor", position=(0.21, 0.95))
+        self.combo_box_bg_color.set_change_callback(self.apply_bg_color)
+
+        self.combo_box_size = ComboBox(self.window, size_options, color='lightgrey', default_text="TextSize", position=(0.37, 0.90))
+        self.combo_box_size.set_change_callback(self.apply_text_size)
+
+        self.combo_box_file = ComboBox(self.window, file_options, color='white', default_text="Save File As:", position=(0.65, 0.99))
+        self.combo_box_file.set_change_callback(self.apply_text_file)
+
+    def setup_buttons(self):
+        save_button = Button(pos=(0.82, 0.99), states=["SaveFile"], c=["green"], bc=["white"], font="Comae")
+        self.window += save_button
+
+        delete_button = Button(pos=(0.93, 0.99), states=["DeleteFile"], c=["red"], bc=["white"], font="Comae")
+        self.window += delete_button
+
+        increase_size_button = Button(pos=(0.39, 0.96), states=["A"], c=["black"], bc=[(1, 1, 1)], font="Comae")
+        self.window += increase_size_button
+
+        decrease_size_button = Button(pos=(0.41, 0.96), size=15, states=["A "], c=["black"], bc=[(1, 1, 1)], font="Comae")
+        self.window += decrease_size_button
+
+        self.toggle_case_button = Button(pos=(0.53, 0.95), states=["Uppercase: OFF", "Uppercase: ON"], c=["black"], bc=["lightgrey"], font="Comae", size =20)
+        self.window += self.toggle_case_button
+
+        self.window.add_callback("mouse click", self.on_save_button_click)
+        self.window.add_callback("mouse click", self.on_toggle_case_button_click)
+
+    def on_toggle_case_button_click(self, event):
+        if event.actor == self.toggle_case_button:
+            self.toggle_uppercase()
+            self.toggle_case_button.switch()
+
+    def toggle_uppercase(self):
+        self.uppercase = not self.uppercase
+
     def update_rect(self):
-        corner1 = [self.pos[0] - self.size[0]/2, self.pos[1] - self.size[1]/2, 0]
-        corner2 = [self.pos[0] + self.size[0]/2, self.pos[1] + self.size[1]/2, 0]
+        corner1 = [self.pos[0] - self.size[0] / 2, self.pos[1] - self.size[1] / 2, 0]
+        corner2 = [self.pos[0] + self.size[0] / 2, self.pos[1] + self.size[1] / 2, 0]
         self.rect_actor = Rectangle(corner1, corner2, c='white', alpha=0.6)
         self.rect_actor.wireframe(False)
 
@@ -165,16 +193,18 @@ class TextBox:
                 "backslash": "\\", "tilde": "~", "grave": "`", "minus": "-", "equal": "=",
                 "quoteleft": "`", "quoteright": "'", "asciitilde": "~", "bar": "|"
             }
-            self.text += special_keys.get(key, key)
+            char = special_keys.get(key, key)
+            if self.uppercase:
+                char = char.upper()
+            self.text += char
         self.update_text()
-        
         if self.callback:
             self.callback(self)
 
     def update_text(self):
         self.window.remove(self.text_actor)
         self.window.remove(self.rect_actor)
-        
+
         lines = self.text.split('\n')
         new_lines = []
         for line in lines:
@@ -184,17 +214,11 @@ class TextBox:
             new_lines.append(line)
         lines = new_lines[:self.max_lines]
         self.text = '\n'.join(lines)
-        
-        max_line_length = min(max(len(line) for line in lines), self.max_line_length)
-        num_lines = len(lines)
 
-        new_width = self.size[0]
-        new_height = self.size[1]
-        
         self.update_rect()
-        
-        text_pos = (self.pos[0] - new_width/2 + 0.01, self.pos[1] + new_height/2 - 0.05 * num_lines)
-        self.text_actor = Text2D(self.text, pos=text_pos, c=self.color, bg=self.bg_color, font=self.font, s=self.text_size, justify=self.align)
+
+        text_pos = (self.pos[0] - self.size[0] / 2 + 0.01, self.pos[1] + self.size[1] / 2 - 0.05 * len(lines))
+        self.text_actor = Text2D(self.text, pos=text_pos, c=self.color, bg=self.bg_color, font=self.font, s=self.text_size, justify='left')
         
         self.window += self.rect_actor
         self.window += self.text_actor
@@ -216,26 +240,47 @@ class TextBox:
         self.text_size = int(size)
         self.update_text()
 
-    def apply_text_align(self, align):
-        self.align = align
+    def apply_text_file(self, file):
+        self.file = file
         self.update_text()
 
     def on_save_button_click(self, event):
         if isinstance(event.actor, Button) and event.actor.states[0] == "SaveFile":
             self.save_text()
+        elif isinstance(event.actor, Button) and event.actor.states[0] == "DeleteFile":
+            self.delete_text()
+        elif isinstance(event.actor, Button) and event.actor.states[0] == "A":
+            self.increase_size_of_text()
+        elif isinstance(event.actor, Button) and event.actor.states[0] == "A ":
+            self.decrease_size_of_text()
 
     def save_text(self):
-        with open("output.txt", "w") as file:
+        with open(self.file, "w") as file:
             file.write(self.text)
-        print("Text saved to output.txt")
+
+    def delete_text(self):
+        file_path = self.file
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        self.text = ""
+        self.update_text()
+
+    def increase_size_of_text(self):
+        if self.text_size < 4:
+            self.text_size += 0.2
+            self.update_text()
+
+    def decrease_size_of_text(self):
+        if self.text_size > 0.5:
+            self.text_size -= 0.2
+            self.update_text()
 
 
 def user_callback(text_box):
-    if "exit\n" in text_box.text:
+    if "exit\n" in text_box.text or "EXIT\n" in text_box.text:
         text_box.window.close()
 
 
 settings.enable_default_keyboard_callbacks = False
 text_box = TextBox(callback=user_callback)
-
 
