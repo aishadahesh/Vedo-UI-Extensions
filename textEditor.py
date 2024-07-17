@@ -91,7 +91,9 @@ class TextBox:
         self.bg_color = 'white'
         self.text_size = 1
         self.file = 'output'
-        self.uppercase = False  # New attribute to handle uppercase
+        self.uppercase = False
+        self.undo_stack = []
+        self.redo_stack = []
         self.window = Plotter(size=(800, 600), title="Text Box Example", interactive=True)
         self.text_actor = Text2D(self.text, pos=self.pos, c=self.color, bg=self.bg_color, font=self.font, s=self.text_size, justify='left')
 
@@ -143,11 +145,37 @@ class TextBox:
         decrease_size_button = Button(pos=(0.41, 0.96), size=15, states=["A "], c=["black"], bc=[(1, 1, 1)], font="Comae")
         self.window += decrease_size_button
 
-        self.toggle_case_button = Button(pos=(0.53, 0.95), states=["Uppercase: OFF", "Uppercase: ON"], c=["black"], bc=["lightgrey"], font="Comae", size =20)
+        self.toggle_case_button = Button(pos=(0.53, 0.95), states=["Uppercase: OFF", "Uppercase: ON"], c=["black"], bc=["lightgrey"], font="Comae", size=20)
         self.window += self.toggle_case_button
+
+        self.undo_button = Button(pos=(0.95, 0.90), states=["Undo"], c=["purple"], bc=["white"], font="Comae", size=20)
+        self.window += self.undo_button
+
+        self.redo_button = Button(pos=(0.9, 0.90), states=["Redo"], c=["blue"], bc=["white"], font="Comae", size=20)
+        self.window += self.redo_button
 
         self.window.add_callback("mouse click", self.on_save_button_click)
         self.window.add_callback("mouse click", self.on_toggle_case_button_click)
+        self.window.add_callback("mouse click", self.on_undo_button_click)
+        self.window.add_callback("mouse click", self.on_redo_button_click)
+
+    def save_state(self):
+        state = {
+            'text': self.text,
+            'font': self.font,
+            'color': self.color,
+            'bg_color': self.bg_color,
+            'text_size': self.text_size
+        }
+        self.undo_stack.append(state)
+
+    def load_state(self, state):
+        self.text = state['text']
+        self.font = state['font']
+        self.color = state['color']
+        self.bg_color = state['bg_color']
+        self.text_size = state['text_size']
+        self.update_text()
 
     def on_toggle_case_button_click(self, event):
         if event.actor == self.toggle_case_button:
@@ -165,17 +193,14 @@ class TextBox:
 
     def on_key_press(self, event):
         key = event.keypress.lower()
-        lines = self.text.split('\n')
+        self.save_state()
         if key == "backspace":
-            if len(lines[-1]) > 0:
-                self.text = self.text[:-1]
-            elif len(lines) > 1:
+            if len(self.text) > 0:
                 self.text = self.text[:-1]
         elif key == "delete":
             self.text = self.text[:-1]
         elif key == "return":
-            if len(lines) < self.max_lines:
-                self.text += "\n"
+            self.text += "\n"
         elif key == "space":
             self.text += " "
         elif key == "tab":
@@ -197,6 +222,7 @@ class TextBox:
             if self.uppercase:
                 char = char.upper()
             self.text += char
+        self.redo_stack.clear()
         self.update_text()
         if self.callback:
             self.callback(self)
@@ -225,23 +251,33 @@ class TextBox:
         self.window.render()
 
     def apply_font_style(self, style):
+        self.save_state()
         self.font = style
+        self.redo_stack.clear()
         self.update_text()
 
     def apply_text_color(self, color):
+        self.save_state()
         self.color = color
+        self.redo_stack.clear()
         self.update_text()
 
     def apply_bg_color(self, color):
+        self.save_state()
         self.bg_color = color
+        self.redo_stack.clear()
         self.update_text()
 
     def apply_text_size(self, size):
+        self.save_state()
         self.text_size = int(size)
+        self.redo_stack.clear()
         self.update_text()
 
     def apply_text_file(self, file):
+        self.save_state()
         self.file = file
+        self.redo_stack.clear()
         self.update_text()
 
     def on_save_button_click(self, event):
@@ -266,14 +302,48 @@ class TextBox:
         self.update_text()
 
     def increase_size_of_text(self):
+        self.save_state()
         if self.text_size < 4:
             self.text_size += 0.2
             self.update_text()
 
     def decrease_size_of_text(self):
+        self.save_state()
         if self.text_size > 0.5:
             self.text_size -= 0.2
             self.update_text()
+
+    def on_undo_button_click(self, event):
+        if event.actor == self.undo_button:
+            self.undo()
+
+    def on_redo_button_click(self, event):
+        if event.actor == self.redo_button:
+            self.redo()
+
+    def undo(self):
+        if self.undo_stack:
+            self.redo_stack.append({
+                'text': self.text,
+                'font': self.font,
+                'color': self.color,
+                'bg_color': self.bg_color,
+                'text_size': self.text_size
+            })
+            state = self.undo_stack.pop()
+            self.load_state(state)
+
+    def redo(self):
+        if self.redo_stack:
+            self.undo_stack.append({
+                'text': self.text,
+                'font': self.font,
+                'color': self.color,
+                'bg_color': self.bg_color,
+                'text_size': self.text_size
+            })
+            state = self.redo_stack.pop()
+            self.load_state(state)
 
 
 def user_callback(text_box):
@@ -283,4 +353,3 @@ def user_callback(text_box):
 
 settings.enable_default_keyboard_callbacks = False
 text_box = TextBox(callback=user_callback)
-
