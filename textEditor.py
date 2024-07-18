@@ -79,12 +79,10 @@ class ComboBox:
 
 
 class TextBox:
-    def __init__(self, initial_text="", pos=(0.5, 0.5), size=(0.8, 0.6), max_lines=15, max_line_length=80, callback=None):
+    def __init__(self, initial_text="", pos=(0.5, 0.5), size=(0.8, 0.6), callback=None):
         self.text = initial_text
         self.pos = pos
         self.size = size
-        self.max_lines = max_lines
-        self.max_line_length = max_line_length
         self.callback = callback
         self.font = "Glasgo"
         self.color = 'black'
@@ -231,19 +229,28 @@ class TextBox:
         self.window.remove(self.text_actor)
         self.window.remove(self.rect_actor)
 
+        # Calculate the max lines and max line length based on the current text size
+        max_line_length = int(self.size[0] / (0.01 * self.text_size))
+        if self.text_size == 1:
+            max_line_length = int(self.size[0] / (0.01 * self.text_size))
+            max_lines = int(self.size[1] / (0.04 * self.text_size))
+        else:
+            max_line_length = int(self.size[0] / (0.0105 * self.text_size))
+            max_lines = int(self.size[1] / (0.036 * self.text_size))
+
         lines = self.text.split('\n')
         new_lines = []
         for line in lines:
-            while len(line) > self.max_line_length:
-                new_lines.append(line[:self.max_line_length])
-                line = line[self.max_line_length:]
+            while len(line) > max_line_length:
+                new_lines.append(line[:max_line_length])
+                line = line[max_line_length:]
             new_lines.append(line)
-        lines = new_lines[:self.max_lines]
+        lines = new_lines[:max_lines]
         self.text = '\n'.join(lines)
 
         self.update_rect()
 
-        text_pos = (self.pos[0] - self.size[0] / 2 + 0.01, self.pos[1] + self.size[1] / 2 - 0.05 * len(lines))
+        text_pos = (self.pos[0] - self.size[0] / 2 + 0.01, self.pos[1] + self.size[1] / 2 - 0.05 * self.text_size * len(lines))
         self.text_actor = Text2D(self.text, pos=text_pos, c=self.color, bg=self.bg_color, font=self.font, s=self.text_size, justify='left')
         
         self.window += self.rect_actor
