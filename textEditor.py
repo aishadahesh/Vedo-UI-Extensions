@@ -5,6 +5,9 @@ class ComboBox:
     def __init__(self, plotter, options, color='green', default_text="Select an option", position=(0, 0)):
         self.plotter = plotter
         self.color = color
+        self.color_options = ["black", "red", "green", "blue", "yellow", "purple", "orange", "pink", "brown"]
+        self.bg_color_options = ["white", "lightgrey", "lightblue", "lightgreen", "lightyellow", "lightpink"]
+
         self.options = options
         self.default_text = default_text
         self.selected_option = default_text
@@ -27,8 +30,14 @@ class ComboBox:
         self.dropdown.pickable(False)
 
         for i, option in enumerate(self.options):
+            curr_color='black'
+            curr_bg='white'
+            if(option in self.color_options):
+                curr_color=option
+            elif(option in self.bg_color_options):
+                curr_bg=option
             text_pos = (pos[0], pos[1] - (i + 1) * 0.05)
-            text = Text2D(option, pos=text_pos, c='k')
+            text = Text2D(option, pos=text_pos, c=curr_color,bg=curr_bg)
             text.pickable()
             self.option_texts.append(option)
             self.option_actors.append(text)
@@ -77,7 +86,14 @@ class ComboBox:
     def set_change_callback(self, callback):
         self.change_callback = callback
 
+    def set_color(self, color):
+        self.color = color
+        self.label.background(self.color)
+        print(f"ComboBox color set to {self.color}")
 
+    def set_label_color(self, color):
+        self.label.color(color)
+        print(f"ComboBox label color set to {color}")
 class TextBox:
     def __init__(self, initial_text="", pos=(0.5, 0.5), size=(0.8, 0.6), callback=None):
         self.text = initial_text
@@ -93,14 +109,15 @@ class TextBox:
         self.undo_stack = []
         self.redo_stack = []
         self.window = Plotter(size=(800, 600), title="Text Box Example", interactive=True)
-        self.text_actor = Text2D(self.text, pos=self.pos, c=self.color, bg=self.bg_color, font=self.font, s=self.text_size, justify='left')
+        self.text_actor = Text2D(self.text, pos=self.pos, c=self.color, bg=self.bg_color, font=self.font,
+                                 s=self.text_size, justify='left')
 
         self.update_rect()
         self.window += Text2D('   ', bg='lightgrey', c='green', s=31, pos=(0.1, 0.8))
         self.window += self.rect_actor
         self.window += self.text_actor
         self.window.add_callback("KeyPressEvent", self.on_key_press)
-
+        self.Text_of_color=""
         self.setup_comboboxes()
         self.setup_buttons()
 
@@ -115,19 +132,25 @@ class TextBox:
         size_options = ["1", "2", "3", "4", "5"]
         file_options = ["output1", "output2", "output3"]
 
-        self.combo_box_font = ComboBox(self.window, font_options, color='lightgrey', default_text="TextFont", position=(0.01, 0.95))
+        self.combo_box_font = ComboBox(self.window, font_options, color='lightgrey', default_text="Font",
+                                       position=(0.01, 0.95))
         self.combo_box_font.set_change_callback(self.apply_font_style)
 
-        self.combo_box_color = ComboBox(self.window, color_options, color='lightgrey', default_text="TextColor", position=(0.11, 0.95))
+        self.combo_box_color = ComboBox(self.window, color_options, color='lightgrey', default_text="Color",
+                                        position=(0.11, 0.95))
+
         self.combo_box_color.set_change_callback(self.apply_text_color)
 
-        self.combo_box_bg_color = ComboBox(self.window, bg_color_options, color='lightgrey', default_text="BackgroundColor", position=(0.21, 0.95))
+        self.combo_box_bg_color = ComboBox(self.window, bg_color_options, color='lightgrey',
+                                           default_text="BackgroundColor", position=(0.21, 0.95))
         self.combo_box_bg_color.set_change_callback(self.apply_bg_color)
 
-        self.combo_box_size = ComboBox(self.window, size_options, color='lightgrey', default_text="TextSize", position=(0.37, 0.90))
+        self.combo_box_size = ComboBox(self.window, size_options, color='lightgrey', default_text="TextSize",
+                                       position=(0.37, 0.90))
         self.combo_box_size.set_change_callback(self.apply_text_size)
 
-        self.combo_box_file = ComboBox(self.window, file_options, color='white', default_text="Save File As:", position=(0.65, 0.99))
+        self.combo_box_file = ComboBox(self.window, file_options, color='white', default_text="Save File As:",
+                                       position=(0.65, 0.99))
         self.combo_box_file.set_change_callback(self.apply_text_file)
 
     def setup_buttons(self):
@@ -140,16 +163,18 @@ class TextBox:
         increase_size_button = Button(pos=(0.39, 0.96), states=["A"], c=["black"], bc=[(1, 1, 1)], font="Comae")
         self.window += increase_size_button
 
-        decrease_size_button = Button(pos=(0.41, 0.96), size=15, states=["A "], c=["black"], bc=[(1, 1, 1)], font="Comae")
+        decrease_size_button = Button(pos=(0.41, 0.96), size=15, states=["A "], c=["black"], bc=[(1, 1, 1)],
+                                      font="Comae")
         self.window += decrease_size_button
 
-        self.toggle_case_button = Button(pos=(0.53, 0.95), states=["Uppercase: OFF", "Uppercase: ON"], c=["black"], bc=["lightgrey"], font="Comae", size=20)
+        self.toggle_case_button = Button(pos=(0.53, 0.95), states=["CapsLk: OFF", "CapsLk: ON"], c=["black"],
+                                         bc=["lightgrey"], font="Comae", size=20)
         self.window += self.toggle_case_button
 
-        self.undo_button = Button(pos=(0.95, 0.90), states=["Undo"], c=["purple"], bc=["white"], font="Comae", size=20)
+        self.undo_button = Button(pos=(0.95, 0.90), states=["←"], c=["purple"], bc=["white"], font="Comae", size=20)
         self.window += self.undo_button
 
-        self.redo_button = Button(pos=(0.9, 0.90), states=["Redo"], c=["blue"], bc=["white"], font="Comae", size=20)
+        self.redo_button = Button(pos=(0.9, 0.90), states=["→"], c=["blue"], bc=["white"], font="Comae", size=20)
         self.window += self.redo_button
 
         self.window.add_callback("mouse click", self.on_save_button_click)
@@ -229,7 +254,6 @@ class TextBox:
         self.window.remove(self.text_actor)
         self.window.remove(self.rect_actor)
 
-        # Calculate the max lines and max line length based on the current text size
         max_line_length = int(self.size[0] / (0.01 * self.text_size))
         if self.text_size == 1:
             max_line_length = int(self.size[0] / (0.01 * self.text_size))
@@ -250,9 +274,11 @@ class TextBox:
 
         self.update_rect()
 
-        text_pos = (self.pos[0] - self.size[0] / 2 + 0.01, self.pos[1] + self.size[1] / 2 - 0.05 * self.text_size * len(lines))
-        self.text_actor = Text2D(self.text, pos=text_pos, c=self.color, bg=self.bg_color, font=self.font, s=self.text_size, justify='left')
-        
+        text_pos = (
+        self.pos[0] - self.size[0] / 2 + 0.01, self.pos[1] + self.size[1] / 2 - 0.05 * self.text_size * len(lines))
+        self.text_actor = Text2D(self.text, pos=text_pos, c=self.color, bg=self.bg_color, font=self.font,
+                                 s=self.text_size, justify='left')
+
         self.window += self.rect_actor
         self.window += self.text_actor
         self.window.render()
@@ -263,14 +289,18 @@ class TextBox:
         self.redo_stack.clear()
         self.update_text()
 
+
+
     def apply_text_color(self, color):
         self.save_state()
         self.color = color
         self.redo_stack.clear()
         self.update_text()
+        self.combo_box_color.set_color(color)
 
     def apply_bg_color(self, color):
         self.save_state()
+        self.combo_box_bg_color.set_color(color)
         self.bg_color = color
         self.redo_stack.clear()
         self.update_text()
