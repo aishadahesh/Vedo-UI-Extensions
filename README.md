@@ -1,35 +1,57 @@
-# PROJECT-IN-COMPUTER-GRAPHICS-AISHA-SALAM
+# Vedo UI Extensions
+A collection of UI components and tools implemented using the Vedo library in Python.
 
- **Installations:**
- - pip install vedo
- 
+## Description
+This project extends the Vedo library with additional UI components and tools such as ComboBox, RadioButton, CheckBox, TextBox, TextEditor, ToggleSwitch, ColorPicker, and Adder. These components provide enhanced interactivity and user input capabilities for Vedo-based applications.
 
-### Overview:
-In this repository, we have extended the Vedo library with additional components. Below is an explanation of each implementation:
+## Clone Project 
+git clone https://github.com/aishadahesh/PROJECT-IN-COMPUTER-GRAPHICS-AISHA-SALAM.git
+
+## Installation
+To install the necessary dependencies, run:
+' pip install vedo '
+
+## Overview:
 
 1. **Check Box:**
- - The check box allows users to toggle between two states (checked/unchecked). It is useful for enabling/disabling specific options in the user interface.
+A set of selectable options represented as checkboxes.
+  ![alt text](README-rsrc/CheckBox.gif)
 
 2. **Combo Box:**
- - The combo box presents a dropdown menu of selectable options. Users can choose one item from the list, making it suitable for selecting from a predefined set of choices.
+A dropdown menu for selecting options.
+  ![alt text](README-rsrc/ComboBox.gif)
 
 3. **Radio Button:**
- - Radio buttons are used when users need to select exactly one option from a set of mutually exclusive choices. Each radio button can be selected individually, and selecting one deselects any others in the same group.
+A set of mutually exclusive options represented as radio buttons.
+  ![alt text](README-rsrc/RadioButton.gif)
 
 4. **Color Picker:**
- - The color picker enables users to choose colors interactively. It provides a visual interface for selecting colors using a color wheel or entering color values directly.
+A color picker tool for adjusting the color of meshes.
+  ![alt text](README-rsrc/ColorPicker.gif)
 
 5. **Text Box:**
  - **Version 1:**
-   - Version 1 of the text box provides basic text input functionality. Users can type and edit text within a defined area.
+  A text input field.
+    ![alt text](README-rsrc/TextBox1.gif)
  - **Version 2:**
-   - Version 2 extends the text box with additional features such as multiline support, text formatting options, and event handling for key presses.
+  A customizable text input field with callback functions.
+    ![alt text](README-rsrc/TextBox2.gif)
 
 6. **Toggle Switch:**
- - The toggle switch offers a simple way to toggle between two states, typically on/off or true/false. It provides a visual indication of the current state and allows users to change it with a single click.
+A switch component with on/off states.
+  ![alt text](README-rsrc/toggleSwitch.gif)
 
 7. **Adder:**
- - The adder component allows users to perform arithmetic operations interactively. It provides input fields for users to enter numbers and buttons for addition, subtraction, multiplication, and division operations.
+A component for incrementing and decrementing a value.
+  ![alt text](README-rsrc/adder.gif)
 
 8. **Text Editor:**
-- Text editor with a customizable text box and various controls, including combo boxes for font, text color, background color, text size, and file name, along with buttons for saving, deleting, and adjusting text size and case. Additionally, the text editor includes undo and redo functionality.
+A full-featured text editor with font, color, size, save/delete options, and undo/redo functionality.
+  ![alt text](README-rsrc/TextEditor.gif)   
+
+
+### Contributors: 
+Aisha Abu dahesh - aishadahesh11@gmail.com
+Salam Qais - salamqais75@gmail.com
+
+ 
