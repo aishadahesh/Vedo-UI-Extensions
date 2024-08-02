@@ -5,7 +5,7 @@ A collection of UI components and tools implemented using the Vedo library in Py
 This project extends the Vedo library with additional UI components and tools such as ComboBox, RadioButton, CheckBox, TextBox, TextEditor, ToggleSwitch, ColorPicker, and Adder. These components provide enhanced interactivity and user input capabilities for Vedo-based applications.
 
 ## Clone Project 
-git clone https://github.com/aishadahesh/PROJECT-IN-COMPUTER-GRAPHICS-AISHA-SALAM.git
+git clone https://github.com/aishadahesh/Vedo-UI-Extensions.git
 
 ## Installation
 To install the necessary dependencies, run:
