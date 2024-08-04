@@ -54,4 +54,6 @@ A full-featured text editor with font, color, size, save/delete options, and und
 Aisha Abu dahesh - aishadahesh11@gmail.com
 Salam Qais - salamqais75@gmail.com
 
- 
+
+
+ **This project was done as part of the requirements for a BSc in computer science at the University of Haifa, under the supervision of Prof. Roi Poranne**
